@@ -38,8 +38,12 @@ G = C/(s*eye(2) - A)*B + D
 
 %%% plot diagramma di Bode
 figure(1);
-title('Funzione di trasferimento - diagramma di bode')
+hold on;
+legend(["G(j\omega)"])
 bode(G);
+title("FDT - G")
+legend(["G(j\omega)"])
+grid on; zoom on;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -50,10 +54,10 @@ bode(G);
 
 %stampa della fuznione di trasferimento
 figure(2);
-hold on; grid on; zoom on; box on;
+hold on; grid on; zoom on;
 plot(TT,YY);
 %%plot(TT, uu); //stampa ingresso
-title('Traiettoria di stato y(t) - Funzione di trasferimento')
+title('Traiettoria di stato y(t) - calcolata dalla fdt')
 xlim([0, 10])
 xlabel('tempo [s]')
 ylabel('posizione')
@@ -64,7 +68,7 @@ legend('y(t) - posizione')
 time = 0:0.01:100;
 
 figure(3);
-hold on;
+hold on; grid on; zoom on;
 YY_i = impulse(G, time);
 YY_s = step(G, time);
 
@@ -135,7 +139,7 @@ margin(G); % privo di senso dal momento che la funzione parte da valori nettamen
 
 %{
 %%
-figure(2)
+figure
 tt = 0:1e-3:0.3; % intervallo temporale: da 0 ad 0.3 con passo 0.001
 
 

@@ -389,15 +389,17 @@ FF = LL/(1+LL);
 %risposta a gradino di tutto il sistema retroazionato
 [y_step, t_step] = step(WW*FF, T_simulation);
 
-figure(6);
+figure(9);
 hold on;
 plot(t_step, y_step);
 
-%figure();
+%figure(4);
 %hold on;
 %step(WW*FF_s, T_simulation);
 % 
 LV = evalfr(WW*FF, 0);
+
+%{}%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %sovraelongazione
@@ -448,14 +450,12 @@ NN = 0;
 
 SS = 1/(1+LL);
 
-figure(7)
+figure(10)
 bode(SS);
-grid on; zoom on;
 title("fdt SS");
 
-figure(8);
+figure(11);
 bode(FF);
-grid on; zoom on;
 title("fdt FF")
 
 tt = 0:1e-8:0.01;    % tempo, da 0 a 15 secondi con passo 0.01
@@ -471,18 +471,18 @@ y_n = lsim(FF,NN,tt);
 
 YY = y_step+y_d+y_n;
 
-figure(9)
-hold on; grid on; zoom on;
-title("y_n - disturbo lettura");
+figure(12)
+title("y_n");
+hold on;
 plot(tt,y_n,'r');
 plot(tt,NN,'g');
 
-figure(10)
-hold on; grid on; zoom on;
-title("y_d - disturbo d'uscita");
+figure(13)
+title("y_d");
+hold on;
 plot(tt,y_d,'r');
 plot(tt,DD,'g');
 
-figure(11)
+figure(14)
 title("YY");
 plot(tt,YY);
