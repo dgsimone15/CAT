@@ -33,19 +33,21 @@ C = [1, 0];
 D = 0;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% fdt
+%%% FDT
 G = C/(s*eye(2) - A)*B + D
 
 %%% plot diagramma di Bode
 figure(1);
 hold on;
-title('Funzione di trasferimento - diagramma di bode')
+legend(["G(j\omega)"])
 bode(G);
+title("FDT - G")
+legend(["G(j\omega)"])
 grid on; zoom on;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-%% uscita fdt ad ingresso uu
+%% uscita FDT ad ingresso uu
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % modello funzione di trasferimento
 [YY, TT] = lsim(G,uu, tt);
@@ -55,14 +57,14 @@ figure(2);
 hold on; grid on; zoom on;
 plot(TT,YY);
 %%plot(TT, uu); //stampa ingresso
-title('Traiettoria di stato y(t) - Funzione di trasferimento')
+title('Traiettoria di stato y(t) - calcolata dalla FDT')
 xlim([0, 10])
 xlabel('tempo [s]')
 ylabel('posizione')
 legend('y(t) - posizione')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% risposta impulsiva fdt
+% risposta impulsiva FDT
 time = 0:0.01:100;
 
 figure(3);
@@ -74,7 +76,7 @@ YY_s = step(G, time);
 plot(time, YY_i, 'r', 'DisplayName', 'impulse response G(s)', 'LineWidth', 1.3);
 plot(time, YY_s, 'b', 'DisplayName', 'step response G(s)', 'LineWidth', 1.3);
 
-title('Risposta fdt')
+title('Risposta FDT')
 xlabel('tempo [s]')
 ylabel('posizione')
 legend(["impulse"; "step"]);
@@ -110,17 +112,17 @@ legend('y(t) - posizione', 'x2 - velocità');
 % l'oggetto comincia a risalire, la velocità passa da valore negativo a
 % valore positivo.
 
-%% controllo fdt
+%% controllo FDT
 Gcontrol = tf(modello) %%ritorna la funzione di trasferimento dal modello, utile per confronto con la tf calcolata
 Id = eye(2);
 
-%% stampa confronto uscite tra fdt e modello LTI
+%% stampa confronto uscite tra FDT e modello LTI
 figure;
 hold on; box on; zoom on; grid on;
-plot(TT,YY, 'r') %%fdt
+plot(TT,YY, 'r') %%FDT
 plot(TT,YY2, 'g') %%LTI
-title('Confronto modello LTI e fdt')
-legend('y(t) fdt', 'y(t) - LTI');
+title('Confronto modello LTI e FDT')
+legend('y(t) FDT', 'y(t) - LTI');
 %%note:
 %sovrapposizione perfetta per: x0 = (0,0)
 % con x0 != 0 la funzione LTI ha un comportamento diverso perché considera
@@ -177,10 +179,11 @@ omega_plot_max = 1e6;
 
 %% Calcolo coppia di equilibrio
 x_1e = ze;
-
 x_2e = 0;
-u_e  = 9.81*m+k*x_1e;
 x_e  = [x_1e;x_2e];
+
+u_e  = 9.81*m+k*x_1e;
+
 
 
 %% Linearizzazione e calcolo FdT
@@ -190,8 +193,7 @@ B = [0; 1/m];
 C = [1, 0];
 D = 0;
 
-s  = tf('s');
-GG = C*inv(s*eye(2) - A)*B + D
+GG = C/(s*eye(2) - A)*B + D
 
 %% Specifiche
 
@@ -315,7 +317,6 @@ Legend_arg = ["G(j\omega)"; "M_f"]; % Legenda colori
 legend(Legend_arg);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%return;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Design del REGOLATORE DINAMICO RR_d
@@ -384,22 +385,24 @@ legend(Legend_arg);
 T_simulation = 2*T_star; %(+1000 per vedere errore a regime)
 FF = LL/(1+LL);
 
-%FF_s = GG_e/(1+GG_e);
+%%TEST FF_s -> risposta dell'anello chiuso privo di regolatore dinamico
+%{
+    FF_s = GG_e/(1+GG_e);
+    figure();
+    hold on;
+    step(WW*FF_s, T_simulation);
+%}
+
 
 %risposta a gradino di tutto il sistema retroazionato
 [y_step, t_step] = step(WW*FF, T_simulation);
 
-figure(9);
+figure(6);
 hold on;
 plot(t_step, y_step);
 
-%figure(4);
-%hold on;
-%step(WW*FF_s, T_simulation);
-% 
-LV = evalfr(WW*FF, 0);
-
-%{}%
+%
+LV = evalfr(WW*FF, 0)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %sovraelongazione
@@ -448,41 +451,53 @@ WW = 1;
 DD = 0;
 NN = 0;
 
-SS = 1/(1+LL);
+SS = 1/(1+LL); % funzione di sensitività
+% FF -> unzione di sensitività complementare
 
-figure(10)
+figure(7)
 bode(SS);
-title("fdt SS");
+grid on; zoom on;
+title("FDT SS");
 
-figure(11);
+figure(8);
 bode(FF);
-title("fdt FF")
+grid on; zoom on;
+title("FDT FF")
 
-tt = 0:1e-8:0.01;    % tempo, da 0 a 15 secondi con passo 0.01
 
+%% Simulazione disturbo in uscita
+tt = 0:1e-2:2e2;
 for k=1:1:4
     DD = DD + sin(0.01*k*tt);
-    NN = NN + 0.2*sin((8*1e4)*k*tt);
 end
-
-[y_step, t_step] = step(WW*LL/(1+LL), tt);
 y_d = lsim(SS,DD,tt);
-y_n = lsim(FF,NN,tt);
-
-YY = y_step+y_d+y_n;
-
-figure(12)
-title("y_n");
-hold on;
-plot(tt,y_n,'r');
-plot(tt,NN,'g');
-
-figure(13)
-title("y_d");
-hold on;
+% plot
+figure(10)
+hold on; grid on; zoom on;
+title("y_d - disturbo d'uscita");
 plot(tt,y_d,'r');
 plot(tt,DD,'g');
 
-figure(14)
-title("YY");
+
+%% Simulazione disturbo di misura
+tt = 0:1e-5:2*1e-3;
+for k=1:1:4
+    NN = NN + 0.2*sin((8*1e4)*k*tt);
+end
+y_n = lsim(FF,NN,tt);
+% plot
+figure(9)
+hold on; grid on; zoom on;
+title("y_n - disturbo lettura");
+plot(tt,y_n,'r');
+plot(tt,NN,'g');
+
+
+%% risposta al gradino del sistema globale
+[y_step, t_step] = step(WW*FF, tt);
+YY = y_step+y_d+y_n;
+
+
+figure(11)
 plot(tt,YY);
+title("YY - risposta al gradino dell'intero sistema")

@@ -33,7 +33,7 @@ C = [1, 0];
 D = 0;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% fdt
+%%% FDT
 G = C/(s*eye(2) - A)*B + D
 
 %%% plot diagramma di Bode
@@ -47,7 +47,7 @@ grid on; zoom on;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-%% uscita fdt ad ingresso uu
+%% uscita FDT ad ingresso uu
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % modello funzione di trasferimento
 [YY, TT] = lsim(G,uu, tt);
@@ -57,14 +57,14 @@ figure(2);
 hold on; grid on; zoom on;
 plot(TT,YY);
 %%plot(TT, uu); //stampa ingresso
-title('Traiettoria di stato y(t) - calcolata dalla fdt')
+title('Traiettoria di stato y(t) - calcolata dalla FDT')
 xlim([0, 10])
 xlabel('tempo [s]')
 ylabel('posizione')
 legend('y(t) - posizione')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% risposta impulsiva fdt
+% risposta impulsiva FDT
 time = 0:0.01:100;
 
 figure(3);
@@ -76,12 +76,12 @@ YY_s = step(G, time);
 plot(time, YY_i, 'r', 'DisplayName', 'impulse response G(s)', 'LineWidth', 1.3);
 plot(time, YY_s, 'b', 'DisplayName', 'step response G(s)', 'LineWidth', 1.3);
 
-title('Risposta fdt')
+title('Risposta FDT')
 xlabel('tempo [s]')
 ylabel('posizione')
-legend(["impulse"; "step"]);
+legend(["impulse G"; "step G"]);
 
-%% test
+%% TEST
 %{
 
 %% G fattorizzato
@@ -112,17 +112,17 @@ legend('y(t) - posizione', 'x2 - velocità');
 % l'oggetto comincia a risalire, la velocità passa da valore negativo a
 % valore positivo.
 
-%% controllo fdt
+%% controllo FDT
 Gcontrol = tf(modello) %%ritorna la funzione di trasferimento dal modello, utile per confronto con la tf calcolata
 Id = eye(2);
 
-%% stampa confronto uscite tra fdt e modello LTI
+%% stampa confronto uscite tra FDT e modello LTI
 figure;
 hold on; box on; zoom on; grid on;
-plot(TT,YY, 'r') %%fdt
+plot(TT,YY, 'r') %%FDT
 plot(TT,YY2, 'g') %%LTI
-title('Confronto modello LTI e fdt')
-legend('y(t) fdt', 'y(t) - LTI');
+title('Confronto modello LTI e FDT')
+legend('y(t) FDT', 'y(t) - LTI');
 %%note:
 %sovrapposizione perfetta per: x0 = (0,0)
 % con x0 != 0 la funzione LTI ha un comportamento diverso perché considera
