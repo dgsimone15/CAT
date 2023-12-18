@@ -75,7 +75,7 @@ plot(time, YY_s, 'b', 'DisplayName', 'step response G(s)', 'LineWidth', 1.3);
 title('Risposta fdt')
 xlabel('tempo [s]')
 ylabel('posizione')
-legend(["impulse"; "response"]);
+legend(["impulse"; "step"]);
 
 %% test
 %{

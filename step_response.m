@@ -20,11 +20,16 @@ G = 1/(m*s^2+s*b+k);
 % risposta impulsiva fdt
 time = 0:0.01:100;
 
-title('Risposta fdt')
 YY_i = impulse(G, time);
 YY_s = step(G, time);
 
 % plot
 plot(time, YY_i, 'r', 'DisplayName', 'impulse response G(s)', 'LineWidth', 1.3);
 plot(time, YY_s, 'b', 'DisplayName', 'step response G(s)', 'LineWidth', 1.3);
+
+title('Risposta fdt')
+xlabel('tempo [s]')
+ylabel('posizione')
+legend(["impulse"; "step"]);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
