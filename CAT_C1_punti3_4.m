@@ -335,7 +335,7 @@ hold on; grid on; zoom on;
 title("y_n - disturbo lettura");
 xlim([0; 2.5e-4]);
 plot(tt,y_n,'r');
-%plot(tt,NN,'g');
+plot(tt,NN,'g');
 
 
 % risposta al gradino del sistema globale
