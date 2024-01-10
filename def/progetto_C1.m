@@ -1,13 +1,11 @@
-close all; clc;
-clear all; %calo significativo delle performance, attivare solo se serve
+clear all; close all; clc;
 
-%% parametri sistema
 s = tf('s'); %%variabile della funzione di trasferimento
-tt = 0:0.01:10; % tempo, da impostare ad almeno -> 0 a 10 secondi con passo 0.01, per risultati affidabili
+tt = 0:0.005:15; % tempo, da 0 a 15 secondi con passo 0.01
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Inserimento valori
-m = 2500;       %% massa
+%%% Inserimento valori
+m = 2500;       %% mass
 b = 350;        %% smorzamento
 k = 5*10^5;     %% cost. elastica lineare
 ze = 0.35;      %% stato iniziale z
@@ -26,71 +24,43 @@ uu(1:length(tt),1) = 9.81*m+k*ze; %%u(t) del sistema, ingresso
 
 %% parte 1
 
-% matrici del sistema linearizzato
-A = [0, 1; -k/m, -b/m];
-B = [0; 1/m];
-C = [1, 0];
-D = 0;
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% FDT
-G = C/(s*eye(2) - A)*B + D
+%%% Fdt
+G = 1/(m*s^2+s*b+k);
+G_fatt = zpk(G) %%zero pole gain model -> forma fattorizzata del primo tipo, p->1/m = 0.0004
 
 %%% plot diagramma di Bode
 figure(1);
-hold on;
-legend(["G(j\omega)"])
+title('Funzione di trasferimento - diagramma di bode')
 bode(G);
-title("FDT - G")
-legend(["G(j\omega)"])
-grid on; zoom on;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-%% uscita FDT ad ingresso uu
+%% uscita fdt ad ingresso uu
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % modello funzione di trasferimento
 [YY, TT] = lsim(G,uu, tt);
 
 %stampa della fuznione di trasferimento
 figure(2);
-hold on; grid on; zoom on;
-plot(TT,YY);
+hold on; grid on; zoom on; box on;
+plot(TT,YY)
 %%plot(TT, uu); //stampa ingresso
-title('Traiettoria di stato y(t) - calcolata dalla FDT')
+title('Traiettoria di stato y(t) - Funzione di trasferimento')
 xlim([0, 10])
 xlabel('tempo [s]')
 ylabel('posizione')
 legend('y(t) - posizione')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% risposta impulsiva FDT
-time = 0:0.01:100;
-
-figure(3);
-hold on; grid on; zoom on;
-YY_i = impulse(G, time);
-YY_s = step(G, time);
-
-% plot
-plot(time, YY_i, 'r', 'DisplayName', 'impulse response G(s)', 'LineWidth', 1.3);
-plot(time, YY_s, 'b', 'DisplayName', 'step response G(s)', 'LineWidth', 1.3);
-
-title('Risposta FDT')
-xlabel('tempo [s]')
-ylabel('posizione')
-legend(["impulse"; "step"]);
-
-%% test
-%{
-
-%% G fattorizzato
-G_manual = 1/(m*s^2+s*b+k);
-G_fatt = zpk(G) %%zero pole gain model -> forma fattorizzata del primo tipo, p->1/m = 0.0004
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% modello LTI
+%%% modello LTI
+
+% matrici del sistema
+A = [0, 1; -k/m, -b/m];
+B = [0; 1/m];
+C = [1, 0];
+D = 0;
 
 % state-space model e soluzione dell'equazione
 modello = ss(A, B, C, D);
@@ -98,7 +68,7 @@ modello = ss(A, B, C, D);
 [YY2, TT, XX] = lsim(modello, uu, tt, x0); %%simulazione modello dinamico
 
 % stampa stato del sistema LTI
-figure;
+figure(3);
 hold on; box on; zoom on; grid on;
 plot(TT, XX);
 %%plot(TT, uu); //stampa ingresso
@@ -112,64 +82,34 @@ legend('y(t) - posizione', 'x2 - velocità');
 % l'oggetto comincia a risalire, la velocità passa da valore negativo a
 % valore positivo.
 
-%% controllo FDT
+% risposta impulsiva fdt
+figure(4);
+title('Risposta impulsiva fdt')
+impulse(G);
+
+% risposta al gradino
+figure(5);
+title('Risposta al gradino fdt')
+step(G);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% test
+%controllo fdt
 Gcontrol = tf(modello) %%ritorna la funzione di trasferimento dal modello, utile per confronto con la tf calcolata
 Id = eye(2);
 
-%% stampa confronto uscite tra FDT e modello LTI
-figure;
+% stampa confronto uscite tra fdt e modello LTI
+figure(6);
 hold on; box on; zoom on; grid on;
-plot(TT,YY, 'r') %%FDT
+plot(TT,YY, 'r') %%fdt
 plot(TT,YY2, 'g') %%LTI
-title('Confronto modello LTI e FDT')
-legend('y(t) FDT', 'y(t) - LTI');
+title('Confronto modello LTI e fdt')
+legend('y(t) fdt', 'y(t) - LTI');
 %%note:
 %sovrapposizione perfetta per: x0 = (0,0)
 % con x0 != 0 la funzione LTI ha un comportamento diverso perché considera
 % l'origine del sistema
 
-%% stampa margine di fase funzione di trasferimento
-figure;
-margin(G); % privo di senso dal momento che la funzione parte da valori nettamente inferiori allo 0db giá nell'origine
-
-%}
-
-
-%% animazioni
-
-%{
-%%
-figure
-tt = 0:1e-3:0.3; % intervallo temporale: da 0 ad 0.3 con passo 0.001
-
-
-
-
-Y = [0, 5, 0:((+9 +55-4)/9):70-4, 55-4, 55-2]
-length(Y)
-
-    plot([0 60],[0 0],'k','LineWidth',4) % ground.
-        hold on; box on; zoom on; grid on;
-    axis([0 50  0 150])    
-    plot(20+[0 0 0 1.5 -1.5 1.5 -1.5 1.5 -1.5 1.5 -1.5 0 0 0],[0, 5, 5:((+9 +55-4)/9):70-4, 70-4, 70-2],'r','LineWidth',2) % spring
-
-%%piatto
-    patch ([10; 40; 40; 10],[70-2; 70-2; 70-2+15; 70-2+15] ,'r','FaceAlpha',0.1) ; % rettangolo rosso con vertici definiti da x ed y
-%%smorzatore
-    patch ([27.5; 32.5; 32.5; 27.5],[30; 30; 40; 40] ,'v','FaceAlpha',0.1) ; % rettangolo rosso con vertici definiti da x ed y
-    plot([30 30],[0 30],'k','LineWidth',4) % ground
-    plot([30 30],[40 70-2],'k','LineWidth',4) % ground
-%%u
-    patch ([24; 26; 26; 24],[10; 10; 50; 50] ,'v','FaceAlpha',0.1) ; % rettangolo rosso con vertici definiti da x ed y
-    plot([25 25],[0 10],'k','LineWidth',4) % ground.
-    plot([25 25],[50 70-2],'k','LineWidth',4) % ground
-
-
-    hold on; box on; zoom on; grid on;
-    uu = 9.81*m + k*[ze;0];
-    yy = lsim(G, uu, tt);
-
-%}
 
 %%%%%%%%%%%%%%%%%%%%%%% PUNTO 3 %%%%%%%%%%%%%%%%%%%%%%%
 
@@ -179,11 +119,10 @@ omega_plot_max = 1e6;
 
 %% Calcolo coppia di equilibrio
 x_1e = ze;
+
 x_2e = 0;
-x_e  = [x_1e;x_2e];
-
 u_e  = 9.81*m+k*x_1e;
-
+x_e  = [x_1e;x_2e];
 
 
 %% Linearizzazione e calcolo FdT
@@ -193,7 +132,8 @@ B = [0; 1/m];
 C = [1, 0];
 D = 0;
 
-GG = C/(s*eye(2) - A)*B + D
+s  = tf('s');
+GG = C*inv(s*eye(2) - A)*B + D
 
 %% Specifiche
 
@@ -241,7 +181,7 @@ GG_e = RR_s*GG
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Mappare specifiche sul diagramma di Bode
 
-figure(4);
+figure(7);
 hold on;
 
 %%%%%%%%%%%
@@ -297,6 +237,7 @@ legend(Legend_mag);
 
 %Plot Bode con margini di stabilità
 margin(GG_e,{omega_plot_min,omega_plot_max});
+
 grid on; zoom on;
 
 %%%%%%%%%%%
@@ -317,6 +258,7 @@ Legend_arg = ["G(j\omega)"; "M_f"]; % Legenda colori
 legend(Legend_arg);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%return;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Design del REGOLATORE DINAMICO RR_d
@@ -353,22 +295,23 @@ R_high_frequency = 1/(1 + s/15000);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 RR = RR_d*RR_s*R_high_frequency;
-%RR = RR_d*RR_s; %funzione di controllo priva di polo in alta frequenza
 
-LL = RR*GG; % funzione di anello aperto
+%RR = RR_d*RR_s;
 
+LL = RR*GG; % funzione di anello
+
+figure(8);
+hold on;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% verificare che la funzione d'anello LL non violi le zone proibite
-figure(5);
-hold on;
 
 patch(patch_d_x, patch_d_y,'r','FaceAlpha',0.2,'EdgeAlpha',0);
 
 patch(patch_n_x, patch_n_y,'g','FaceAlpha',0.2,'EdgeAlpha',0);
 
 patch(patch_omega_c_x, patch_omega_c_y,'b','FaceAlpha',0.2,'EdgeAlpha',0);
-%%TODO correggere legenda 
+
 legend(Legend_mag);
 margin(LL,{omega_plot_min,omega_plot_max}); % Plot Bode con margini di stabilità
 grid on; zoom on;
@@ -385,24 +328,22 @@ legend(Legend_arg);
 T_simulation = 2*T_star; %(+1000 per vedere errore a regime)
 FF = LL/(1+LL);
 
-%%TEST FF_s -> risposta dell'anello chiuso privo di regolatore dinamico
-%{
-    FF_s = GG_e/(1+GG_e);
-    figure();
-    hold on;
-    step(WW*FF_s, T_simulation);
-%}
-
+%FF_s = GG_e/(1+GG_e);
 
 %risposta a gradino di tutto il sistema retroazionato
 [y_step, t_step] = step(WW*FF, T_simulation);
 
-figure(6);
+figure(9);
 hold on;
 plot(t_step, y_step);
 
-%
-LV = evalfr(WW*FF, 0)
+%figure(4);
+%hold on;
+%step(WW*FF_s, T_simulation);
+% 
+LV = evalfr(WW*FF, 0);
+
+%{}%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %sovraelongazione
@@ -429,20 +370,6 @@ Legend_step = ["Risposta al gradino"; "Vincolo sovraelongazione"; "Vincolo tempo
 legend(Legend_step);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% Mostrare risposta al disturbo in uscita con ampiezza unitaria e pulsazione omega_d_MAX
-tt = 1:0.01:100;
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% Mostrare risposta al disturbo di misura con ampiezza unitaria e pulsazione omega_n_min
-tt = 0:1e-5:2*1e-3;
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
-
-
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PUNTO 4 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Test sul sistema linearizzato con w, d e n dati da testo
@@ -451,53 +378,41 @@ WW = 1;
 DD = 0;
 NN = 0;
 
-SS = 1/(1+LL); % funzione di sensitività
-% FF -> unzione di sensitività complementare
+SS = 1/(1+LL);
 
-figure(7)
+figure(10)
 bode(SS);
-grid on; zoom on;
-title("FDT SS");
+title("fdt SS");
 
-figure(8);
+figure(11);
 bode(FF);
-grid on; zoom on;
-title("FDT FF")
+title("fdt FF")
 
+tt = 0:1e-8:0.01;    % tempo, da 0 a 15 secondi con passo 0.01
 
-%% Simulazione disturbo in uscita
-tt = 0:1e-2:2e2;
 for k=1:1:4
     DD = DD + sin(0.01*k*tt);
-end
-y_d = lsim(SS,DD,tt);
-% plot
-figure(10)
-hold on; grid on; zoom on;
-title("y_d - disturbo d'uscita");
-plot(tt,y_d,'r');
-plot(tt,DD,'g');
-
-
-%% Simulazione disturbo di misura
-tt = 0:1e-5:2*1e-3;
-for k=1:1:4
     NN = NN + 0.2*sin((8*1e4)*k*tt);
 end
+
+[y_step, t_step] = step(WW*LL/(1+LL), tt);
+y_d = lsim(SS,DD,tt);
 y_n = lsim(FF,NN,tt);
-% plot
-figure(9)
-hold on; grid on; zoom on;
-title("y_n - disturbo lettura");
+
+YY = y_step+y_d+y_n;
+
+figure(12)
+title("y_n");
+hold on;
 plot(tt,y_n,'r');
 plot(tt,NN,'g');
 
+figure(13)
+title("y_d");
+hold on;
+plot(tt,y_d,'r');
+plot(tt,DD,'g');
 
-%% risposta al gradino del sistema globale
-[y_step, t_step] = step(WW*FF, tt);
-YY = y_step+y_d+y_n;
-
-
-figure(11)
+figure(14)
+title("YY");
 plot(tt,YY);
-title("YY - risposta al gradino dell'intero sistema")

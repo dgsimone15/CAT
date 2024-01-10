@@ -368,7 +368,7 @@ patch(patch_d_x, patch_d_y,'r','FaceAlpha',0.2,'EdgeAlpha',0);
 patch(patch_n_x, patch_n_y,'g','FaceAlpha',0.2,'EdgeAlpha',0);
 
 patch(patch_omega_c_x, patch_omega_c_y,'b','FaceAlpha',0.2,'EdgeAlpha',0);
-%%TODO correggere legenda 
+%%TODO correggere legenda
 legend(Legend_mag);
 margin(LL,{omega_plot_min,omega_plot_max}); % Plot Bode con margini di stabilità
 grid on; zoom on;
@@ -428,20 +428,6 @@ patch(patch_T_x,patch_T_y_down,'g','FaceAlpha',0.1,'EdgeAlpha',0.1);
 Legend_step = ["Risposta al gradino"; "Vincolo sovraelongazione"; "Vincolo tempo di assestamento"];
 legend(Legend_step);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% Mostrare risposta al disturbo in uscita con ampiezza unitaria e pulsazione omega_d_MAX
-tt = 1:0.01:100;
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% Mostrare risposta al disturbo di misura con ampiezza unitaria e pulsazione omega_n_min
-tt = 0:1e-5:2*1e-3;
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
-
 
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PUNTO 4 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
