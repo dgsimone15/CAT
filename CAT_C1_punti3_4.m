@@ -202,7 +202,7 @@ patch(patch_d_x, patch_d_y,'r','FaceAlpha',0.2,'EdgeAlpha',0);
 patch(patch_n_x, patch_n_y,'g','FaceAlpha',0.2,'EdgeAlpha',0);
 
 patch(patch_omega_c_x, patch_omega_c_y,'b','FaceAlpha',0.2,'EdgeAlpha',0);
-%%TODO correggere legenda 
+
 legend(Legend_mag);
 margin(LL,{omega_plot_min,omega_plot_max}); % Plot Bode con margini di stabilità
 grid on; zoom on;
@@ -263,20 +263,6 @@ Legend_step = ["Risposta al gradino"; "Vincolo sovraelongazione"; "Vincolo tempo
 legend(Legend_step);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% Mostrare risposta al disturbo in uscita con ampiezza unitaria e pulsazione omega_d_MAX
-tt = 1:0.01:100;
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% Mostrare risposta al disturbo di misura con ampiezza unitaria e pulsazione omega_n_min
-tt = 0:1e-5:2*1e-3;
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
-
-
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PUNTO 4 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Test sul sistema linearizzato con w, d e n dati da testo
@@ -300,7 +286,8 @@ title("FDT FF")
 
 %{
 usiamo un unico tt per permettere di stampare la YY generale, é un suicidio
-prestazionale!!
+prestazionale!! serve per avere gli array comparabili per il calcolo della
+y(t) finale
 %}
 
 %% analisi dei segnali
@@ -323,8 +310,12 @@ y_d_plot = lsim(SS,DD,tt_d_plot);
 figure(7)
 hold on; grid on; zoom on;
 title("y_d - disturbo d'uscita");
-plot(tt_d_plot,y_d_plot,'r');
+xlabel("time");
 plot(tt_d_plot,DD,'g');
+plot(tt_d_plot,y_d_plot,'r');
+legend(["y_d_out - disturbo in uscita"; "y_n - segnale in ingresso del disturbo in uscita"]);
+
+
 
 
 % simulazione disturbo di misura
@@ -333,9 +324,11 @@ y_n = lsim(FF,NN,tt);
 figure(8)
 hold on; grid on; zoom on;
 title("y_n - disturbo lettura");
-xlim([0; 2.5e-4]);
-plot(tt,y_n,'r');
+xlim([0; 2.5e-4]);a
+xlabel("time");
 plot(tt,NN,'g');
+plot(tt,y_n,'r');
+legend(["y_n_out - disturbo di misura in uscita"; "y_n - segnale in ingresso del disturbo di misura"]);
 
 
 % risposta al gradino del sistema globale

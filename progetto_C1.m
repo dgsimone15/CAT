@@ -57,7 +57,7 @@ figure(2);
 hold on; grid on; zoom on;
 plot(TT,YY);
 %%plot(TT, uu); //stampa ingresso
-title('Traiettoria di stato y(t) - calcolata dalla FDT')
+title('Traiettoria di stato y(t) - calcolata dalla FDT di G')
 xlim([0, 10])
 xlabel('tempo [s]')
 ylabel('posizione')
@@ -443,50 +443,67 @@ SS = 1/(1+LL); % funzione di sensitività
 figure(7)
 bode(SS);
 grid on; zoom on;
-title("FDT SS");
+title("Bode Diagram - SS");
 
 figure(8);
 bode(FF);
 grid on; zoom on;
-title("FDT FF")
+title("Bode Diagram - FF")
 
 %{
 usiamo un unico tt per permettere di stampare la YY generale, é un suicidio
-prestazionale!!
+prestazionale!! serve per avere gli array comparabili per il calcolo della
+y(t) finale
 %}
-%% Simulazione disturbo in uscita
-tt = 0:1e-3:2e3;
+
+%% analisi dei segnali
+tt = 0:5e-8:0.2;
 for k=1:1:4
     DD = DD + sin(0.01*k*tt);
-end
-y_d = lsim(SS,DD,tt);
-% plot
-figure(10)
-hold on; grid on; zoom on;
-title("y_d - disturbo d'uscita");
-plot(tt,y_d,'r');
-plot(tt,DD,'g');
-
-
-%% Simulazione disturbo di misura
-for k=1:1:4
     NN = NN + 0.2*sin((8*1e4)*k*tt);
 end
-y_n = lsim(FF,NN,tt);
+y_d = lsim(SS,DD,tt); % calcolo y_d nel breve intervallo di tempo necessario per la stampa della funzione completa 
+
+
+% simulazione disturbo in uscita -> (-40dB, 0g) => *1/100
+tt_d_plot = 0:5e-3:2000;
+DD = 0;
+for k=1:1:4
+    DD = DD + sin(0.01*k*tt_d_plot);
+end
+y_d_plot = lsim(SS,DD,tt_d_plot);
 % plot
 figure(9)
 hold on; grid on; zoom on;
+title("y_d - disturbo d'uscita");
+xlabel("time");
+plot(tt_d_plot,DD,'g');
+plot(tt_d_plot,y_d_plot,'r');
+legend(["y_d_out - disturbo in uscita"; "y_n - segnale in ingresso del disturbo in uscita"]);
+
+
+
+
+% simulazione disturbo di misura
+y_n = lsim(FF,NN,tt);
+% plot
+figure(10)
+hold on; grid on; zoom on;
 title("y_n - disturbo lettura");
-xlim([0; 1]);
-plot(tt,y_n,'r');
+xlim([0; 2.5e-4]);
+xlabel("time");
 plot(tt,NN,'g');
+plot(tt,y_n,'r');
+legend(["y_n_out - disturbo di misura in uscita"; "y_n - segnale in ingresso del disturbo di misura"]);
 
 
-%% risposta al gradino del sistema globale
+% risposta al gradino del sistema globale
+
 [y_step, t_step] = step(WW*FF, tt);
 YY = y_step+y_d+y_n;
 % plot
 figure(11)
 plot(tt,YY);
-xlim([0;1]);
+xlim([0;0.2]);
 title("YY - risposta al gradino dell'intero sistema")
+xlabel('tempo')
