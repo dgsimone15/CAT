@@ -486,7 +486,7 @@ legend(["y_d_out - disturbo in uscita"; "y_n - segnale in ingresso del disturbo 
 
 
 % simulazione disturbo di misura
-y_n = lsim(FF,NN,tt);
+y_n = lsim(-FF,NN,tt);
 % plot
 figure(10)
 hold on; grid on; zoom on;
@@ -508,3 +508,4 @@ plot(tt,YY);
 xlim([0;0.2]);
 title("YY - risposta al gradino dell'intero sistema")
 xlabel('tempo')
+legend("YY - risposta al gradino")

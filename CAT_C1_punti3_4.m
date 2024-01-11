@@ -319,12 +319,12 @@ legend(["y_d_out - disturbo in uscita"; "y_n - segnale in ingresso del disturbo 
 
 
 % simulazione disturbo di misura
-y_n = lsim(FF,NN,tt);
+y_n = lsim(-FF,NN,tt);
 % plot
 figure(8)
 hold on; grid on; zoom on;
 title("y_n - disturbo lettura");
-xlim([0; 2.5e-4]);a
+xlim([0; 2.5e-4]);
 xlabel("time");
 plot(tt,NN,'g');
 plot(tt,y_n,'r');
@@ -340,3 +340,4 @@ figure(9)
 plot(tt,YY);
 xlim([0;0.2]);
 title("YY - risposta al gradino dell'intero sistema")
+legend("YY");
