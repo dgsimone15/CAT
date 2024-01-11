@@ -76,7 +76,7 @@ YY_s = step(G, time);
 plot(time, YY_i, 'r', 'DisplayName', 'impulse response G(s)', 'LineWidth', 1.3);
 plot(time, YY_s, 'b', 'DisplayName', 'step response G(s)', 'LineWidth', 1.3);
 
-title('risposte impulsiva e al gradino di G')
+title('risposte impulsiv')
 xlabel('tempo [s]')
 ylabel('posizione')
 legend(["impulse"; "step"]);
@@ -399,7 +399,7 @@ FF = LL/(1+LL);
 
 figure(6);
 hold on;
-title('risposta al gradino sistema FF')
+title('risposta al gradino')
 plot(t_step, y_step);
 
 %
