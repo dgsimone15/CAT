@@ -20,7 +20,12 @@ pos_init = ze; % [m]
 vel_init = 0; % [m/s]
 x0 = [pos_init; vel_init];
 
+x_1e = ze;
+x_2e = 0;
+x_e  = [x_1e;x_2e];
+
 %%uu(1:length(tt),1) = 500; ingresso di test con valore costante
+u_e  = 9.81*m+k*x_1e;
 uu(1:length(tt),1) = 9.81*m+k*ze; %%u(t) del sistema, ingresso
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -34,13 +39,13 @@ D = 0;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% FDT
-G = C/(s*eye(2) - A)*B + D
+GG = C/(s*eye(2) - A)*B + D
 
 %%% plot diagramma di Bode
 figure(1);
 hold on;
 legend(["G(j\omega)"])
-bode(G);
+bode(GG);
 title("Bode Diagram - G")
 legend(["G(j\omega)"])
 grid on; zoom on;
@@ -50,7 +55,7 @@ grid on; zoom on;
 %% uscita FDT ad ingresso uu
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % modello funzione di trasferimento
-[YY, TT] = lsim(G,uu, tt);
+[YY, TT] = lsim(GG,uu, tt);
 
 %stampa della fuznione di trasferimento
 figure(2);
@@ -69,8 +74,8 @@ time = 0:0.01:100;
 
 figure(3);
 hold on; grid on; zoom on;
-YY_i = impulse(G, time);
-YY_s = step(G, time);
+YY_i = impulse(GG, time);
+YY_s = step(GG, time);
 
 % plot
 plot(time, YY_i, 'r', 'DisplayName', 'impulse response G(s)', 'LineWidth', 1.3);
@@ -137,9 +142,9 @@ margin(G); % privo di senso dal momento che la funzione parte da valori nettamen
 
 %% animazioni
 
-%{
+
 %%
-figure
+figure(20)
 tt = 0:1e-3:0.3; % intervallo temporale: da 0 ad 0.3 con passo 0.001
 
 
@@ -165,9 +170,6 @@ length(Y)
     plot([25 25],[50 70-2],'k','LineWidth',4) % ground
 
 
-    hold on; box on; zoom on; grid on;
-    uu = 9.81*m + k*[ze;0];
-    yy = lsim(G, uu, tt);
 
 %}
 
@@ -176,24 +178,6 @@ length(Y)
 %solo per visualizzione, pulsazione minima e massima
 omega_plot_min = 1e-3;
 omega_plot_max = 1e6;
-
-%% Calcolo coppia di equilibrio
-x_1e = ze;
-x_2e = 0;
-x_e  = [x_1e;x_2e];
-
-u_e  = 9.81*m+k*x_1e;
-
-
-
-%% Linearizzazione e calcolo FdT
-% matrici del sistema
-A = [0, 1; -k/m, -b/m];
-B = [0; 1/m];
-C = [1, 0];
-D = 0;
-
-GG = C/(s*eye(2) - A)*B + D
 
 %% Specifiche
 
@@ -223,7 +207,7 @@ Mf_esp = 30;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% progettare REGOLATORE STATICO RR_s
 
-mu_s_error = (WW + DD)/e_star
+mu_s_error = (WW + DD)/e_star;
 % calcolo del guadagno voluto per avere errore e_star
 
 mu_s_RR_s = mu_s_error/abs(evalfr(GG,j*0));
@@ -298,6 +282,7 @@ legend(Legend_mag);
 %Plot Bode con margini di stabilità
 margin(GG_e,{omega_plot_min,omega_plot_max});
 grid on; zoom on;
+title('Bode Diagram - GG_e');
 
 %%%%%%%%%%%
 %%% mappare margine di fase (in diagramma di fase)
@@ -368,11 +353,11 @@ patch(patch_d_x, patch_d_y,'r','FaceAlpha',0.2,'EdgeAlpha',0);
 patch(patch_n_x, patch_n_y,'g','FaceAlpha',0.2,'EdgeAlpha',0);
 
 patch(patch_omega_c_x, patch_omega_c_y,'b','FaceAlpha',0.2,'EdgeAlpha',0);
-%%TODO correggere legenda
+
 legend(Legend_mag);
 margin(LL,{omega_plot_min,omega_plot_max}); % Plot Bode con margini di stabilità
 grid on; zoom on;
-
+title('Bode Diagram - LL');
 % margine di fase
 patch(patch_M_f_x, patch_M_f_y,'g','FaceAlpha',0.2,'EdgeAlpha',0);
 
@@ -480,7 +465,7 @@ title("y_d - disturbo d'uscita");
 xlabel("time");
 plot(tt_d_plot,DD,'g');
 plot(tt_d_plot,y_d_plot,'r');
-legend(["y_d_out - disturbo in uscita"; "y_n - segnale in ingresso del disturbo in uscita"]);
+legend(["DD - segnale disturbo d'uscita"; "y_d - uscita con ingresso DD"]);
 
 
 
@@ -495,7 +480,7 @@ xlim([0; 2.5e-4]);
 xlabel("time");
 plot(tt,NN,'g');
 plot(tt,y_n,'r');
-legend(["y_n_out - disturbo di misura in uscita"; "y_n - segnale in ingresso del disturbo di misura"]);
+legend(["NN - segnale disturbo di misura"; "y_n - uscita con ingresso NN"]);
 
 
 % risposta al gradino del sistema globale
@@ -504,6 +489,7 @@ legend(["y_n_out - disturbo di misura in uscita"; "y_n - segnale in ingresso del
 YY = y_step+y_d+y_n;
 % plot
 figure(11)
+hold on; grid on; zoom on;
 plot(tt,YY);
 xlim([0;0.2]);
 title("YY - risposta al gradino dell'intero sistema")

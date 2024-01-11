@@ -1,5 +1,23 @@
 %%%%%%%%%%%%%%%%%%%%%%% PUNTO 3 %%%%%%%%%%%%%%%%%%%%%%%
 
+%% Calcolo coppia di equilibrio
+x_1e = ze;
+x_2e = 0;
+x_e  = [x_1e;x_2e];
+
+u_e  = 9.81*m+k*x_1e;
+
+
+
+%% Linearizzazione e calcolo FdT
+% matrici del sistema
+A = [0, 1; -k/m, -b/m];
+B = [0; 1/m];
+C = [1, 0];
+D = 0;
+
+GG = C/(s*eye(2) - A)*B + D
+
 %solo per visualizzione, pulsazione minima e massima
 omega_plot_min = 1e-3;
 omega_plot_max = 1e6;
