@@ -139,40 +139,6 @@ margin(G); % privo di senso dal momento che la funzione parte da valori nettamen
 
 %}
 
-
-%% animazioni
-
-
-%%
-figure(20)
-tt = 0:1e-3:0.3; % intervallo temporale: da 0 ad 0.3 con passo 0.001
-
-
-
-
-Y = [0, 5, 0:((+9 +55-4)/9):70-4, 55-4, 55-2]
-length(Y)
-
-    plot([0 60],[0 0],'k','LineWidth',4) % ground.
-        hold on; box on; zoom on; grid on;
-    axis([0 50  0 150])    
-    plot(20+[0 0 0 1.5 -1.5 1.5 -1.5 1.5 -1.5 1.5 -1.5 0 0 0],[0, 5, 5:((+9 +55-4)/9):70-4, 70-4, 70-2],'r','LineWidth',2) % spring
-
-%%piatto
-    patch ([10; 40; 40; 10],[70-2; 70-2; 70-2+15; 70-2+15] ,'r','FaceAlpha',0.1) ; % rettangolo rosso con vertici definiti da x ed y
-%%smorzatore
-    patch ([27.5; 32.5; 32.5; 27.5],[30; 30; 40; 40] ,'v','FaceAlpha',0.1) ; % rettangolo rosso con vertici definiti da x ed y
-    plot([30 30],[0 30],'k','LineWidth',4) % ground
-    plot([30 30],[40 70-2],'k','LineWidth',4) % ground
-%%u
-    patch ([24; 26; 26; 24],[10; 10; 50; 50] ,'v','FaceAlpha',0.1) ; % rettangolo rosso con vertici definiti da x ed y
-    plot([25 25],[0 10],'k','LineWidth',4) % ground.
-    plot([25 25],[50 70-2],'k','LineWidth',4) % ground
-
-
-
-%}
-
 %%%%%%%%%%%%%%%%%%%%%%% PUNTO 3 %%%%%%%%%%%%%%%%%%%%%%%
 
 %solo per visualizzione, pulsazione minima e massima
