@@ -180,7 +180,8 @@ mu_s_RR_s = mu_s_error/abs(evalfr(GG,j*0));
 % calcolo guadagno del regolatore statico come rapporto tra guadagno voluto e guadagno di GG a 0
 
 mu_s_d = 10^(A_d/20)/abs(evalfr(GG,j*omega_d_MAX));
-% calcolo guadagno del regolatore statico all'infinito (alla pulsazione massima per errore d)
+% calcolo guadagno del regolatore statico all'infinito (alla pulsazione
+% massima per errore d) -> attenuazione Ad della Yd(t)
 
 RR_s = max(mu_s_RR_s, mu_s_d);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -354,7 +355,7 @@ title('risposta al gradino sistema FF')
 plot(t_step, y_step);
 
 %
-LV = evalfr(WW*FF, 0)
+LV = evalfr(WW*FF, 0); %%y(inf) = mu*R0 con Ro valore gradino
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %sovraelongazione
